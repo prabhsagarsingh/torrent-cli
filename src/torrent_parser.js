@@ -5,6 +5,7 @@ import crypto from 'crypto';
 
 
 const torrent_parser = {
+    BLOCK_LEN : Math.pow(2, 14),
     open : (filePath) => {
         return bencode.decode(fs.readFileSync(filePath));
     },
@@ -19,6 +20,21 @@ const torrent_parser = {
     infoHash: (torrent) => {
         const info = bencode.encode(torrent);
         return crypto.createHash('sha1').update(info).digest();
+    },
+
+    pieceLen: function (torrent,pieceIndex) {
+        const totalLength = BigNum.fromBuffer(this.size(torrent)).toNumber();
+        const pieceLength = torrent.info['piece length']
+
+        const lastPieceLength = totalLength% pieceLength;
+        const lastPieceIndex = Math.floor(totalLength/pieceLength);
+
+        return lastPieceIndex === pieceIndex ? lastPieceLength : pieceLength;
+    },
+
+    blocksPerPiece: function (torrent,pieceIndex)  {
+        const pieceLength = this.pieceLen(torrent, pieceIndex);
+        return Math.ceil(pieceLength/this.BLOCK_LEN);
     }
 }
 
