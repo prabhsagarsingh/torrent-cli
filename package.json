@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "bencode": "^4.0.0",
+    "bignum": "^0.13.1",
     "debug": "^4.4.0"
   }
 }
