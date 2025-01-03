@@ -103,18 +103,19 @@ const tracker = {
     getPeers: (torrent,cb) => {
         const socket = dgram.createSocket('udp4');
         const url = Buffer.from(torrent.announce).toString('utf-8');
-        console.log("This is the url ", url);    
         
         helperFunc._updSend(socket,helperFunc._buildConnReq(),url);
 
         socket.on("message", response => {
             if (helperFunc._respType(response)=="connect") {
+                console.log("connect response");
                 const connResp = helperFunc._parseConnResp(response);
 
                 const announceReq =  helperFunc._announceReq(connResp.connectionId,torrent);              
                 helperFunc._updSend(socket,announceReq,url);
             }
             else if (helperFunc._respType(response)=="announce") {
+                console.log("announce response");
                 const announceResp = helperFunc._parseAnnounceResp(response);
                 cb(announceResp.peers);
             } 
